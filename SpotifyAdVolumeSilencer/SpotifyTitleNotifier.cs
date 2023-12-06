@@ -21,9 +21,6 @@ namespace SpotifyAdVolumeSilencer
                 if (_currentTitle != value)
                 {
                     _currentTitle = value;
-
-                    if (TitleChanged != null)
-                        TitleChanged.Invoke(null, EventArgs.Empty);
                 }
             }
         }
@@ -50,7 +47,12 @@ namespace SpotifyAdVolumeSilencer
                 var proc = Process.GetProcessesByName("Spotify").Where(p => p.MainWindowTitle != string.Empty).ToArray();
 
                 if (proc.Length > 0 && _currentTitle != proc[0].MainWindowTitle)
+                {
                     _currentTitle = proc[0].MainWindowTitle;
+
+                    if (TitleChanged != null)
+                        TitleChanged.Invoke(null, EventArgs.Empty);
+                }
 
             } catch (ArgumentNullException)
             {

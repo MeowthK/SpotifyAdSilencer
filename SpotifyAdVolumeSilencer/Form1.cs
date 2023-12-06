@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows.Forms;
 using AudioSwitcher.AudioApi.CoreAudio;
 
@@ -7,9 +8,9 @@ namespace SpotifyAdVolumeSilencer
 {
     public partial class Form1 : Form
     {
-        double preferredVolume = 0;
         double lastVolume;
         bool activated = false;
+        static double preferredVolume;
         static CoreAudioDevice audio = new CoreAudioController().DefaultPlaybackDevice;
 
         public Form1()
@@ -25,6 +26,7 @@ namespace SpotifyAdVolumeSilencer
             volume.ValueChanged += (obj, ev) => preferredVolume = volume.Value;
 
             SpotifyTitleNotifier.StartMonitoring(ms: 1000);
+            SpotifyTitleNotifier.TitleChanged += SpotifyTitleNotifier_TitleChanged;
             activateTooltip.SetToolTip(btnActivate, "Activates Spotify Ad volume ducking and minimizes this window.");
         }
 
@@ -61,13 +63,11 @@ namespace SpotifyAdVolumeSilencer
             if (activated)
             {
                 lastVolume = audio.Volume;
-                SpotifyTitleNotifier.TitleChanged += SpotifyTitleNotifier_TitleChanged;
                 MinimizeAction();
             }
             else
             {
                 audio.Volume = lastVolume;
-                SpotifyTitleNotifier.TitleChanged -= SpotifyTitleNotifier_TitleChanged;
             }
         }
 
